@@ -1,25 +1,53 @@
 package handlers
 
 import (
-	"main/markups"
+	"fmt"
 
-	"gopkg.in/telebot.v3"
+	"main/handlers/base"
+
 	tele "gopkg.in/telebot.v3"
 )
 
 type StartHandlers struct {
-	Bot *tele.Bot
+	*base.BaseHandler
 }
 
 func StartHandlerInit(b *tele.Bot) *StartHandlers {
-	return &StartHandlers{
-		Bot: b,
+	sh := &StartHandlers{
+		BaseHandler: base.BaseHandlerInit(b, "start"),
 	}
+
+	sh.Handlers = map[string]tele.HandlerFunc{
+		"btn1": sh.FirstButton,
+		"btn2": sh.SecondButton,
+	}
+
+	sh.RegisterHandlers()
+	return sh
 }
 
-func (sh *StartHandlers) StartFunction(c tele.Context) error {
-	menu := &telebot.ReplyMarkup{}
+func (sh *StartHandlers) StartMessage(c tele.Context) error {
+	return c.Send(sh.Message, sh.Menu)
+}
 
-	markups.SetMarkupData(menu, "start")
-	return c.Send("Hello world!", menu)
+func (sh *StartHandlers) FirstButton(c tele.Context) error {
+	if err := c.Delete(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := FormCreatorHandlerInit(sh.Bot).StartMessage(c); err != nil {
+		fmt.Println(err.Error())
+	}
+	return nil
+}
+
+func (sh *StartHandlers) SecondButton(c tele.Context) error {
+	if err := c.Delete(); err != nil {
+		fmt.Println(err.Error())
+	}
+
+	if err := StartHandlerInit(sh.Bot).StartMessage(c); err != nil {
+		fmt.Println(err.Error())
+	}
+	return nil
 }

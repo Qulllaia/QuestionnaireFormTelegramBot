@@ -1,42 +1,15 @@
-[
-  {
-    "cmp": "group",
-    "group": [
-      {
-        "cmp": "button",
-        "button": "btn1",
-        "name": "Кнопка 1"
-      },
-      {
-        "cmp": "button",
-        "button": "btn2",
-        "name": "Кнопка 2"
-      }
-    ]
-  },
-  {
-    "cmp": "button",
-    "button": "btn3",
-    "name": "Кнопка 3"
-  },
-  {
-    "cmp": "button",
-    "button": "btn4",
-    "name": "Кнопка 4"
-  },
-  {
-    "cmp": "group",
-    "group": [
-      {
-        "cmp": "button",
-        "button": "btn5",
-        "name": "Кнопка 5"
-      },
-      {
-        "cmp": "button",
-        "button": "btn6",
-        "name": "Кнопка 6"
-      }
-    ]
-  }
-]
+{
+  "message": "Выберите действие для продолжения",
+  "buttons": [
+    {
+      "cmp": "button",
+      "button": "btn1",
+      "name": "Создать анкету"
+    },
+    {
+      "cmp": "button",
+      "button": "btn2",
+      "name": "Перейти по идентификатору анкеты"
+    }
+  ]
+}

@@ -29,6 +29,10 @@ func BaseHandlerInit(b *tele.Bot, pageName string) *BaseHandler {
 
 func (sh *BaseHandler) RegisterHandlers() {
 	for name, handler := range sh.Handlers {
+		if name == tele.OnText {
+			sh.Bot.Handle(name, handler)
+			continue
+		}
 		sh.Bot.Handle(sh.SysmetButtons[name], handler)
 	}
 }

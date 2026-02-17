@@ -1,10 +1,30 @@
 {
-  "message": "Выберите действие для продолжения2",
+  "message": "Введите свой вопрос:",
   "buttons": [
     {
       "cmp": "button",
       "button": "btn3",
       "name": "Назад"
+    },
+    {
+      "cmp": "group",
+      "group": [
+        {
+          "cmp": "button",
+          "button": "next_question",
+          "name": "Следующий вопрос"
+        },
+        {
+          "cmp": "button",
+          "button": "prev_question",
+          "name": "Предыдущий вопрос"
+        }
+      ]
+    },
+    {
+      "cmp": "button",
+      "button": "stop_creating_questions",
+      "name": "Закончить создание анкеты"
     }
   ]
 }

@@ -6,6 +6,7 @@ import (
 
 	"main/handlers/base"
 
+	"gopkg.in/telebot.v3"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -46,6 +47,23 @@ func FormCreatorHandlerInit(b *tele.Bot) *FormCreatorHandlers {
 }
 
 func (fc *FormCreatorHandlers) StartMessage(c tele.Context) error {
+	if fc.questions.Prev != nil && (fc.questions.Text == "" || len(fc.questions.Answers) == 0) {
+		err := fc.Bot.Respond(c.Callback(),
+			&telebot.CallbackResponse{
+				Text:      "Сначала введите данные для этого вопроса",
+				ShowAlert: true,
+			})
+		if err != nil {
+			return err
+		}
+
+		return nil
+	}
+
+	var err error
+	var msg *tele.Message
+	var msgText string
+
 	if fc.questions.Next == nil {
 		newQuestion := &Question{
 			fc.questions,
@@ -53,22 +71,23 @@ func (fc *FormCreatorHandlers) StartMessage(c tele.Context) error {
 			"",
 			make([]string, 0),
 		}
-
 		fc.questions.Next = newQuestion
-
 		fc.questions = newQuestion
+		msgText = fc.Message
 
-		msg, err := c.Bot().Send(c.Recipient(), fc.Message, fc.Menu)
-		fc.questionMsg = msg
-
-		return err
 	} else {
 		fc.questions = fc.questions.Next
-		msg, err := c.Bot().Send(c.Recipient(), fc.QuestionTemplate(fc.questions), fc.Menu)
-		fc.questionMsg = msg
+		if fc.questions.Text == "" {
+			msgText = fc.Message
+		} else {
+			msgText = fc.QuestionTemplate(fc.questions)
+		}
 
-		return err
 	}
+
+	msg, err = c.Bot().Send(c.Recipient(), msgText, fc.Menu)
+	fc.questionMsg = msg
+	return err
 }
 
 func (fc *FormCreatorHandlers) PrevQuestion(c tele.Context) error {
@@ -87,12 +106,13 @@ func (fc *FormCreatorHandlers) StopMessage(c tele.Context) error {
 		head = fc.questions
 	}
 
-	msgText := "Ваши итоговые вопросы: "
+	msgText := strings.Builder{}
+	msgText.WriteString("Ваши итоговые вопросы: ")
 	for ; head != nil; head = head.Next {
-		msgText += fmt.Sprintf("\n%s", fc.QuestionTemplate(head))
+		msgText.WriteString(fmt.Sprintf("\n%s", fc.QuestionTemplate(head)))
 	}
 
-	msg, err := c.Bot().Send(c.Recipient(), msgText, fc.Menu)
+	msg, err := c.Bot().Send(c.Recipient(), msgText.String(), fc.Menu)
 	fc.questionMsg = msg
 	return err
 }

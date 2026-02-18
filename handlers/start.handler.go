@@ -35,7 +35,7 @@ func (sh *StartHandlers) FirstButton(c tele.Context) error {
 		fmt.Println(err.Error())
 	}
 
-	if err := FormCreatorHandlerInit(sh.Bot).StartMessage(c); err != nil {
+	if err := FormCreatorHandlerInit(sh.Bot, nil).StartMessage(c); err != nil {
 		fmt.Println(err.Error())
 	}
 	return nil

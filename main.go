@@ -12,6 +12,9 @@ import (
 func main() {
 	config := inits.InitConfig()
 
+	db := inits.InitDatabase(config)
+	defer db.Close()
+
 	b, err := tele.NewBot(tele.Settings{
 		Token:  config.Token,
 		Poller: &tele.LongPoller{Timeout: 10 * time.Second},

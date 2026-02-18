@@ -2,20 +2,14 @@ package handlers
 
 import (
 	"fmt"
-	"strings"
 
 	"main/handlers/base"
+
+	. "main/datatypes"
 
 	"gopkg.in/telebot.v3"
 	tele "gopkg.in/telebot.v3"
 )
-
-type Question struct {
-	Prev    *Question
-	Next    *Question
-	Text    string
-	Answers []string
-}
 
 type FormCreatorHandlers struct {
 	*base.BaseHandler
@@ -23,15 +17,20 @@ type FormCreatorHandlers struct {
 	questions   *Question
 }
 
-func FormCreatorHandlerInit(b *tele.Bot) *FormCreatorHandlers {
+func FormCreatorHandlerInit(b *tele.Bot, q *Question) *FormCreatorHandlers {
+	var questions *Question = &Question{
+		nil,
+		nil,
+		"",
+		make([]string, 0),
+	}
+
+	if q != nil {
+		questions = q
+	}
 	fc := &FormCreatorHandlers{
 		BaseHandler: base.BaseHandlerInit(b, "form-creator"),
-		questions: &Question{
-			nil,
-			nil,
-			"",
-			make([]string, 0),
-		},
+		questions:   questions,
 	}
 
 	fc.Handlers = map[string]tele.HandlerFunc{
@@ -80,7 +79,7 @@ func (fc *FormCreatorHandlers) StartMessage(c tele.Context) error {
 		if fc.questions.Text == "" {
 			msgText = fc.Message
 		} else {
-			msgText = fc.QuestionTemplate(fc.questions)
+			msgText = fc.questions.QuestionTemplate()
 		}
 
 	}
@@ -92,29 +91,13 @@ func (fc *FormCreatorHandlers) StartMessage(c tele.Context) error {
 
 func (fc *FormCreatorHandlers) PrevQuestion(c tele.Context) error {
 	fc.questions = fc.questions.Prev
-	msg, err := c.Bot().Send(c.Recipient(), fc.QuestionTemplate(fc.questions), fc.Menu)
+	msg, err := c.Bot().Send(c.Recipient(), fc.questions.QuestionTemplate(), fc.Menu)
 	fc.questionMsg = msg
 	return err
 }
 
 func (fc *FormCreatorHandlers) StopMessage(c tele.Context) error {
-	var head *Question
-	if fc.questions.Prev == nil {
-		head = fc.questions
-	}
-	for ; fc.questions.Prev != nil; fc.questions = fc.questions.Prev {
-		head = fc.questions
-	}
-
-	msgText := strings.Builder{}
-	msgText.WriteString("Ваши итоговые вопросы: ")
-	for ; head != nil; head = head.Next {
-		msgText.WriteString(fmt.Sprintf("\n%s", fc.QuestionTemplate(head)))
-	}
-
-	msg, err := c.Bot().Send(c.Recipient(), msgText.String(), fc.Menu)
-	fc.questionMsg = msg
-	return err
+	return FormFinisherHandlerInit(fc.Bot, fc.questions).StartMessage(c)
 }
 
 func (fc *FormCreatorHandlers) FirstButtons(c tele.Context) error {
@@ -141,13 +124,9 @@ func (fc *FormCreatorHandlers) OnQuestionEnter(c tele.Context) error {
 
 	_, err := fc.Bot.Edit(
 		fc.questionMsg,
-		fc.QuestionTemplate(fc.questions),
+		fc.questions.QuestionTemplate(),
 		fc.questionMsg.ReplyMarkup,
 	)
 
 	return err
-}
-
-func (fc *FormCreatorHandlers) QuestionTemplate(q *Question) string {
-	return fmt.Sprintf("%s \n%s", q.Text, strings.Join(q.Answers, "\n"))
 }

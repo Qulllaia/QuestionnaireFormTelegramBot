@@ -25,11 +25,13 @@ func InitDatabase(config *Config) *sqlx.DB {
 	return databaseInstance
 }
 
-func GetDatabaseConnection() *sqlx.DB {
-	if databaseInstance != nil {
-		return databaseInstance
+func GetRepoInstanceDatabaseConnection[T ISerializable](repo T) T {
+	if databaseInstance == nil {
+		panic("Попытка получить репозиторий при несуществующем инстансe БД")
 	}
-	panic("Попытка получить несуществующий инстанс БД")
+
+	repo.InitDBValue(databaseInstance)
+	return repo
 }
 
 func connectionStringFormat(config *Config) string {
@@ -38,4 +40,8 @@ func connectionStringFormat(config *Config) string {
 			config.DB_USER, config.DB_PASSWORD, config.DB_NAME, config.DB_SSLMODE)
 	}
 	return fmt.Sprintf("user=%s dbname=%s sslmode=%s", config.DB_USER, config.DB_NAME, config.DB_SSLMODE)
+}
+
+type ISerializable interface {
+	InitDBValue(*sqlx.DB)
 }

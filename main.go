@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	"main/handlers"
 	"main/inits"
+	"main/route"
 
 	tele "gopkg.in/telebot.v3"
 )
@@ -23,7 +25,6 @@ func main() {
 		panic(fmt.Errorf("error while loading telebot: %s", err.Error()))
 	}
 
-	inits.InitHandlers(b)
-
+	route.StartRoutesInit(*handlers.StartHandlerInit(b))
 	b.Start()
 }

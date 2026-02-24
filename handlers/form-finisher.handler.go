@@ -33,10 +33,12 @@ func FormFinisherHandlerInit(b *tele.Bot, q *Question) *FormFinisherHandlers {
 	ff := &FormFinisherHandlers{
 		BaseHandler: base.BaseHandlerInit(b, "form-finisher"),
 		questions:   questions,
+		ffq:         *queries.FormFinisherQueryRepo(),
 	}
 
 	ff.Handlers = map[string]tele.HandlerFunc{
-		"break": ff.ReturnToCreating,
+		"break":  ff.ReturnToCreating,
+		"finish": ff.Finish,
 	}
 
 	ff.RegisterHandlers()
@@ -65,4 +67,19 @@ func (ff *FormFinisherHandlers) StartMessage(c tele.Context) error {
 
 func (ff *FormFinisherHandlers) ReturnToCreating(c tele.Context) error {
 	return FormCreatorHandlerInit(ff.Bot, ff.questions).StartMessage(c)
+}
+
+func (ff *FormFinisherHandlers) Finish(c tele.Context) error {
+	var head *Question
+	if ff.questions.Prev == nil {
+		head = ff.questions
+	}
+	for ; ff.questions.Prev != nil; ff.questions = ff.questions.Prev {
+		head = ff.questions
+	}
+
+	for ; head != nil; head = head.Next {
+		ff.ffq.SaveQuestionnaire(head)
+	}
+	return StartHandlerInit(ff.Bot).StartMessage(c)
 }

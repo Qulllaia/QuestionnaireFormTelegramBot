@@ -8,6 +8,7 @@ import (
 	"main/handlers/base"
 	"main/queries"
 
+	"github.com/google/uuid"
 	tele "gopkg.in/telebot.v3"
 )
 
@@ -70,6 +71,12 @@ func (ff *FormFinisherHandlers) ReturnToCreating(c tele.Context) error {
 }
 
 func (ff *FormFinisherHandlers) Finish(c tele.Context) error {
+	uid := uuid.New()
+
+	if err := ff.ffq.CreateQuestionnaire(uid, c.Sender().ID); err != nil {
+		return err
+	}
+
 	var head *Question
 	if ff.questions.Prev == nil {
 		head = ff.questions
@@ -79,7 +86,7 @@ func (ff *FormFinisherHandlers) Finish(c tele.Context) error {
 	}
 
 	for ; head != nil; head = head.Next {
-		ff.ffq.SaveQuestionnaire(head)
+		ff.ffq.SaveQuestions(head, uid)
 	}
 	return StartHandlerInit(ff.Bot).StartMessage(c)
 }

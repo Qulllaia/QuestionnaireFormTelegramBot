@@ -41,7 +41,3 @@ func connectionStringFormat(config *Config) string {
 	}
 	return fmt.Sprintf("user=%s dbname=%s sslmode=%s", config.DB_USER, config.DB_NAME, config.DB_SSLMODE)
 }
-
-type ISerializable interface {
-	InitDBValue(*sqlx.DB)
-}

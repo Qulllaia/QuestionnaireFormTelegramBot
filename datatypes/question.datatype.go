@@ -8,8 +8,8 @@ import (
 type Question struct {
 	Prev    *Question
 	Next    *Question
-	Text    string
-	Answers []string
+	Text    string   `db:"question"`
+	Answers []string `db:"answers"`
 }
 
 func (q *Question) QuestionTemplate() string {

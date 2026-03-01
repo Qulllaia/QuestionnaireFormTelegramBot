@@ -46,7 +46,7 @@ func (sh *StartHandlers) SecondButton(c tele.Context) error {
 		fmt.Println(err.Error())
 	}
 
-	if err := StartHandlerInit(sh.Bot).StartMessage(c); err != nil {
+	if err := StartQuesctionnaireHandlerInit(sh.Bot).StartMessage(c); err != nil {
 		fmt.Println(err.Error())
 	}
 	return nil

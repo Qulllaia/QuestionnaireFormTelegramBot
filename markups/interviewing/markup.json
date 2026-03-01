@@ -1,0 +1,20 @@
+{
+  "message": "Вопрос:",
+  "buttons": [
+    {
+      "cmp": "button",
+      "button": "break",
+      "name": "Остановить прохождение анкеты"
+    },
+    {
+      "cmp": "button",
+      "button": "prev",
+      "name": "Предыдущий вопрос"
+    },
+    {
+      "cmp": "button",
+      "button": "next",
+      "name": "Следующий вопрос"
+    }
+  ]
+}

@@ -77,16 +77,15 @@ func (ff *FormFinisherHandlers) Finish(c tele.Context) error {
 		return err
 	}
 
-	var head *Question
-	if ff.questions.Prev == nil {
-		head = ff.questions
-	}
-	for ; ff.questions.Prev != nil; ff.questions = ff.questions.Prev {
-		head = ff.questions
-	}
+	head := ff.questions.GetHead()
+	fmt.Println(head)
+	// 	head = ff.questions
+	// for ; ff.questions != nil; ff.questions = ff.questions.Prev {
+	// }
 
-	for ; head != nil; head = head.Next {
-		ff.ffq.SaveQuestions(head, uid)
+	err := ff.ffq.SaveQuestions(head, uid)
+	if err != nil {
+		return err
 	}
 	return StartHandlerInit(ff.Bot).StartMessage(c)
 }

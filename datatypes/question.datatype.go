@@ -2,7 +2,6 @@ package datatypes
 
 import (
 	"fmt"
-	"strings"
 )
 
 type Question struct {
@@ -13,5 +12,18 @@ type Question struct {
 }
 
 func (q *Question) QuestionTemplate() string {
-	return fmt.Sprintf("%s \n%s", q.Text, strings.Join(q.Answers, "\n"))
+	questionsString := ""
+	for _, v := range q.Answers {
+		questionsString += fmt.Sprintf(" - %s \n", v)
+	}
+	return fmt.Sprintf("Вопрос: %s \n%s", q.Text, questionsString)
+}
+
+func (q *Question) GetHead() *Question {
+	var head *Question
+	current := q
+	for ; current != nil; current = current.Prev {
+		head = current
+	}
+	return head.Next
 }

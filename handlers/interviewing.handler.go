@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"strconv"
+
 	. "main/datatypes"
 	"main/handlers/base"
 
@@ -28,8 +30,8 @@ func InterviewingHandlerInit(b *tele.Bot, questions *Question) *InterviewingHand
 func (ih *InterviewingHandlers) StartMessage(c tele.Context) error {
 	head := ih.questions
 	msgText := head.Text + "\n"
-	for _, v := range head.Answers {
-		msgText = msgText + v
+	for index, v := range head.Answers {
+		msgText = msgText + strconv.Itoa(index+1) + ". " + v + "\n"
 	}
 
 	return c.Send(ih.Message+msgText, ih.Menu)

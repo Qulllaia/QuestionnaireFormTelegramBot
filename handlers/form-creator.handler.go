@@ -117,9 +117,9 @@ func (fc *FormCreatorHandlers) FirstButtons(c tele.Context) error {
 func (fc *FormCreatorHandlers) OnQuestionEnter(c tele.Context) error {
 	text := c.Text()
 	if fc.questions.Text == "" {
-		fc.questions.Text = fmt.Sprintf("Вопрос: %s", text)
+		fc.questions.Text = text
 	} else {
-		fc.questions.Answers = append(fc.questions.Answers, fmt.Sprintf(" - %s", text))
+		fc.questions.Answers = append(fc.questions.Answers, text)
 	}
 
 	_, err := fc.Bot.Edit(

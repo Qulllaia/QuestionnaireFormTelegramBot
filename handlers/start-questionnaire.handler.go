@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"fmt"
-
 	"main/handlers/base"
 	"main/queries"
 
@@ -50,7 +48,6 @@ func (sqh *StartQuesctionnaireHandlers) OnUIDEnter(c tele.Context) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(" ", questions.Text)
 
 	return InterviewingHandlerInit(sqh.Bot, questions).StartMessage(c)
 }

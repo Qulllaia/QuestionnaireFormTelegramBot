@@ -2,6 +2,7 @@ package queries
 
 import (
 	"fmt"
+	"strings"
 
 	"main/datatypes"
 	"main/inits"
@@ -24,12 +25,31 @@ func (ff *FormFinisherQuery) InitDBValue(db *sqlx.DB) {
 	ff.db = db
 }
 
-func (ff *FormFinisherQuery) SaveQuestions(questions *datatypes.Question, uuid uuid.UUID) {
-	res, err := ff.db.Exec("INSERT INTO QUESTIONS(question, answers, questionnaire_uid) VALUES($1, $2, $3)", questions.Text, questions.Answers, uuid)
-	if err != nil {
-		fmt.Println(err.Error())
+func (ff *FormFinisherQuery) SaveQuestions(questions *datatypes.Question, uuid uuid.UUID) error {
+	valuesBatch := strings.Builder{}
+	for ; questions != nil; questions = questions.Next {
+		if questions.Text == "" {
+			break
+		}
+
+		if questions.Next == nil {
+			valuesBatch.WriteString(fmt.Sprintf("('%s', '%s', '%s') \n",
+				questions.Text,
+				"{"+strings.Join(questions.Answers, ",")+"}",
+				uuid))
+			continue
+		}
+
+		valuesBatch.WriteString(fmt.Sprintf("('%s', '%s', '%s'), \n",
+			questions.Text,
+			"{"+strings.Join(questions.Answers, ",")+"}",
+			uuid))
 	}
-	fmt.Println(res.RowsAffected())
+	_, err := ff.db.Exec("INSERT INTO QUESTIONS(question, answers, questionnaire_uid) VALUES " + valuesBatch.String())
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (ff *FormFinisherQuery) CreateQuestionnaire(uuid uuid.UUID, userid int64) error {
